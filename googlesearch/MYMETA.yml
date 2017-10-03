@@ -1,0 +1,30 @@
+---
+abstract: unknown
+author:
+  - 'Daniel Torres <daniel.torres@owasp.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: googlesearch
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  HTML::Entities: '0'
+  HTML::Scrubber: '0'
+  HTML::TokeParser: '0'
+  HTML::TreeBuilder: '0'
+  HTTP::Cookies: '0'
+  LWP::UserAgent: '0'
+  Regexp::Common: '0'
+  URI::Escape: '0'
+version: '1.1'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

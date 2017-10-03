@@ -1,0 +1,35 @@
+---
+abstract: unknown
+author:
+  - 'Daniel Torres <daniel.torres@owasp.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: linkedin
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  HTML::Entities: '1'
+  HTTP::Cookies: '1'
+  HTTP::Response: '1'
+  JSON: '1'
+  LWP::UserAgent: '1'
+  List::Util: '1'
+  MIME::Base64::Perl: '1'
+  Moose: '1'
+  Net::SSL: '1'
+  POSIX: '1'
+  Time::HiRes: '1'
+  URI::Escape: '1'
+  perl: '5.006'
+version: '1.0'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
