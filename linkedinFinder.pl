@@ -1,3 +1,4 @@
+#!/usr/bin/perl
 use googlesearch;
 use linkedin;
 use Data::Dumper;
@@ -5,10 +6,11 @@ use Getopt::Std;
 use Term::ANSIColor qw(:constants);
 
 my %opts;
-getopts('e:p:h', \%opts);
+getopts('e:p:k:h', \%opts);
 
 my $enterprise = $opts{'e'} if $opts{'e'};
 my $pages = $opts{'p'} if $opts{'p'};
+my $key = $opts{'k'} if $opts{'k'};
 
 my $banner = <<EOF;
 
@@ -23,7 +25,8 @@ sub usage {
   print "Uso:  \n";  
   print "-e : Nombre de la empresa (Como aparece en LinkedIN) \n";
   print "-p : Paginas de google a revisar \n";
-  print "perl linkedFinder.pl -e [empresa]  -p 3 \n";  
+  print "-k : UNA palabra clave para filtrar la salida (sigla o nombre de la empresa ) \n";
+  print "perl linkedFinder.pl -e [Mi empresa SRL]  -p 3 -k empresa \n";  
   
 }	
 
@@ -57,6 +60,7 @@ $term = "site:bo.linkedin.com -inurl:/jobs/ \"$enterprise\" -intitle:mejores";
 
 print YELLOW,"\t[+] Termino de busqueda: $term \n",RESET;
 print YELLOW,"\t[+] Paginas a revisar: $pages \n",RESET;
+print YELLOW,"\t[+] Filtrar resultados por: $key \n",RESET;
 
 print BLUE,"\t[+] Buscando en google \n",RESET;
 		
@@ -74,11 +78,12 @@ for (my $page =0 ; $page<=$pages-1;$page++)
 			print SALIDA $url,"\n" ;
 			close (SALIDA);
 		}	
+		print "\t\t[+] Durmiendo 30 segundos para evitar bloqueo de google \n";
 		sleep 30;
 }		
 			
 
-print BLUE,"\t[+] Extrayendo de datos de linked-in \n",RESET;		
+print BLUE,"\t[+] Extrayendo datos de linked-in \n",RESET;		
   
 $linkedin->login;								
 										
@@ -98,6 +103,10 @@ while ($url=<MYINPUT>)
 	  my $response = $linkedin->dispatch(url =>$url,method => 'GET');	  
 	  my $response_1 = $response->decoded_content;	  	 
 	  $response_1 =~ s/&quot;/"/g; 	
+	  
+	  open (SALIDA,">linked.html") || die "ERROR: No puedo abrir el fichero google.html\n";
+	print SALIDA $response_1;
+	close (SALIDA);
 	  
 	  
 	  while($response_1 =~ /"occupation":"(.*?)"/g) 
@@ -135,4 +144,5 @@ while ($url=<MYINPUT>)
 close MYINPUT;
 
 
-system("grep -va Independiente linked.csv > linked2.csv");
+system("grep -ai $key linked.csv > linkedin_$key.csv");
+system("rm linked.csv; rm url-list.csv");
