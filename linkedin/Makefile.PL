@@ -31,6 +31,7 @@ WriteMakefile(
         'MIME::Base64::Perl'              => 1.0,
         'POSIX'              => 1.0,
         'HTML::Entities'              => 1.0,
+        'Text::Unidecode'              => 1.0,                
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'linkedin-*' },

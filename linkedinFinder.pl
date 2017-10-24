@@ -4,6 +4,9 @@ use linkedin;
 use Data::Dumper;
 use Getopt::Std;
 use Term::ANSIColor qw(:constants);
+use utf8;
+use Text::Unidecode;
+binmode STDOUT, ":encoding(UTF-8)";
 
 my %opts;
 getopts('e:p:k:h', \%opts);
@@ -91,6 +94,13 @@ open (MYINPUT,"<url-list.csv") || die "ERROR: Can not open the file \n";
 while ($url=<MYINPUT>)
 { 
   $url =~ s/\n//g; 	
+  
+ if($url =~ /dir/m){	 
+	 $url = "";
+	 print "\t\t[+] La URL es solo un listado de perfiles \n";
+ }
+ 
+  
   if ( $url ne "")
   {
 	  my $occupation;
@@ -104,9 +114,9 @@ while ($url=<MYINPUT>)
 	  my $response_1 = $response->decoded_content;	  	 
 	  $response_1 =~ s/&quot;/"/g; 	
 	  
-	  open (SALIDA,">linked.html") || die "ERROR: No puedo abrir el fichero google.html\n";
-	print SALIDA $response_1;
-	close (SALIDA);
+	  #open (SALIDA,">linked.html") || die "ERROR: No puedo abrir el fichero google.html\n";
+	#print SALIDA $response_1;
+	#close (SALIDA);
 	  
 	  
 	  while($response_1 =~ /"occupation":"(.*?)"/g) 
