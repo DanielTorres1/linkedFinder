@@ -104,6 +104,7 @@ while ($url=<MYINPUT>)
   if ( $url ne "")
   {
 	  my $occupation;
+	  my $companyName;
 	  my $lastName;
 	  my $firstName;
 
@@ -114,15 +115,16 @@ while ($url=<MYINPUT>)
 	  my $response_1 = $response->decoded_content;	  	 
 	  $response_1 =~ s/&quot;/"/g; 	
 	  
-	  #open (SALIDA,">linked.html") || die "ERROR: No puedo abrir el fichero google.html\n";
-	#print SALIDA $response_1;
-	#close (SALIDA);
-	  
-	  
+  
 	  while($response_1 =~ /"occupation":"(.*?)"/g) 
 	 {
        $occupation = $1; 
       }
+      
+       while($response_1 =~ /"companyName":"(.*?)"/g) 
+	 {
+       $companyName = $1; 
+      }           
 
 	 while($response_1 =~ /"firstName":"(.*?)"/g) 
 	 {
@@ -135,16 +137,23 @@ while ($url=<MYINPUT>)
       }
 	  	 
 
-
+	#open (SALIDA,">$firstName.html") || die "ERROR: No puedo abrir el fichero google.html\n";
+	#print SALIDA $response_1;
+	#close (SALIDA);
+	  
+	  
 	  print "\t\t[+] Extrayendo datos del perfil $url \n";	  
-	  print "\t\t\t[i] occupation $occupation \n";
 	  print "\t\t\t[i] Name : $firstName $lastName \n";	  ;
+	  print "\t\t\t[i] occupation $occupation \n";
+	  print "\t\t\t[i] companyName  $companyName\n\n";
+	  
 	  #"occupation":"Geretne General en Cooperativa  Catedral de Tarija Ltda."
 	  
 	  if ($occupation ne "")
 	  {	  
-		open (SALIDA,">>linked.csv") || die "ERROR: No puedo abrir el fichero google.html\n";
-		print SALIDA "$firstName;$lastName;$occupation\n";
+		open (SALIDA,">>linked.csv") || die "ERROR: No puedo abrir el fichero google.html\n";		
+		my $output = only_ascii("$firstName;$lastName;$occupation;$companyName");		
+		print SALIDA "$output\n";
 		close (SALIDA);
 	   }
   }
@@ -154,5 +163,27 @@ while ($url=<MYINPUT>)
 close MYINPUT;
 
 
-system("grep -ai $key linked.csv > linkedin_$key.csv");
+system("grep --color=never -ai $key linked.csv > linkedin_$key.csv");
 system("rm linked.csv; rm url-list.csv");
+
+
+sub only_ascii
+{
+ my ($text) = @_;
+ 
+$text =~ s/á/a/g; 
+$text =~ s/é/e/g; 
+$text =~ s/í/i/g; 
+$text =~ s/ó/o/g; 
+$text =~ s/ú/u/g;
+$text =~ s/ñ/n/g; 
+
+$text =~ s/Á/A/g; 
+$text =~ s/É/E/g; 
+$text =~ s/Í/I/g; 
+$text =~ s/Ó/O/g; 
+$text =~ s/Ú/U/g;
+$text =~ s/Ñ/N/g;
+
+return $text;
+}
