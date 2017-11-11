@@ -18,7 +18,7 @@
 #     LICENSE => q[perl]
 #     NAME => q[googlesearch]
 #     PL_FILES => {  }
-#     PREREQ_PM => { HTML::Entities=>q[0], HTML::Scrubber=>q[0], HTML::TokeParser=>q[0], HTML::TreeBuilder=>q[0], HTTP::Cookies=>q[0], LWP::UserAgent=>q[0], Regexp::Common=>q[0], URI::Escape=>q[0] }
+#     PREREQ_PM => { HTML::Entities=>q[0], HTML::Scrubber=>q[0], HTML::TokeParser=>q[0], HTML::TreeBuilder=>q[0], HTTP::Cookies=>q[0], LWP::UserAgent=>q[0], Moose=>q[0], Regexp::Common=>q[0], URI::Escape=>q[0] }
 #     TEST_REQUIRES => {  }
 #     VERSION_FROM => q[lib/googlesearch.pm]
 #     clean => { FILES=>q[googlesearch-*] }
@@ -509,6 +509,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '  HTML::TreeBuilder: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  HTTP::Cookies: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  LWP::UserAgent: '\''0'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  Moose: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  Regexp::Common: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  URI::Escape: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'version: '\''1.1'\''' >> META_new.yml
@@ -555,6 +556,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '            "HTML::TreeBuilder" : "0",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "HTTP::Cookies" : "0",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "LWP::UserAgent" : "0",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Moose" : "0",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "Regexp::Common" : "0",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "URI::Escape" : "0"' >> META_new.json
 	$(NOECHO) $(ECHO) '         }' >> META_new.json
@@ -849,6 +851,7 @@ ppd :
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="HTML::TreeBuilder" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="HTTP::Cookies" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="LWP::UserAgent" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Moose::" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Regexp::Common" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="URI::Escape" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="x86_64-linux-gnu-thread-multi-5.24" />' >> $(DISTNAME).ppd

@@ -7,10 +7,21 @@ use Term::ANSIColor qw(:constants);
 use utf8;
 use Text::Unidecode;
 binmode STDOUT, ":encoding(UTF-8)";
-
 my %opts;
 getopts('e:p:k:h', \%opts);
 
+################ Config here ##################
+
+my $mail = 'johnswyyf@hotmail.com';
+my $password ='vdhgd543Hs';
+my $profile= "https://www.linkedin.com/in/juan-perez-91a7b112a/";
+################################################
+
+
+my @profile_array = split /\//, $profile; #from URL to array
+my $mypattern = @profile_array[4]; # juan-perez-91a7b112a
+	  
+	  
 my $enterprise = $opts{'e'} if $opts{'e'};
 my $pages = $opts{'p'} if $opts{'p'};
 my $key = $opts{'k'} if $opts{'k'};
@@ -51,8 +62,8 @@ $time = sprintf( "%04d-%02d-%02d",$t->year + 1900, $t->mon + 1, $t->mday);
 
 my $google_search = googlesearch->new();
 
-my $linkedin = linkedin->new( mail => 'johnswyyf@hotmail.com',					
-					password => 'vdhgd543Hs', 					
+my $linkedin = linkedin->new( mail => $mail,					
+					password => $password, 					
 					debug => 0, 
 					proxy_host => '',
 					proxy_port => '',
@@ -81,8 +92,9 @@ for (my $page =0 ; $page<=$pages-1;$page++)
 			print SALIDA $url,"\n" ;
 			close (SALIDA);
 		}	
-		print "\t\t[+] Durmiendo 30 segundos para evitar bloqueo de google \n";
-		sleep 30;
+		my $time_sleep = 30+($page*10);
+		print "\t\t[+] Durmiendo $time_sleep  segundos para evitar bloqueo de google \n";
+		sleep $time_sleep ;
 }		
 			
 
@@ -110,20 +122,27 @@ while ($url=<MYINPUT>)
 
 	  $url =~ s/bo\./www\./g; 	
 	  $url = $url."/?ppe=1";
-	  
+	  my $counter=0;
+	  REPEAT:
 	  my $response = $linkedin->dispatch(url =>$url,method => 'GET');	  
 	  my $response_1 = $response->decoded_content;	  	 
-	  $response_1 =~ s/&quot;/"/g; 	
-	  
+	  $response_1 =~ s/&quot;/"/g; 
+	  $response_1 =~ s/&#92;"/'/g; 	 
+	  	  	 
+	  	  
+	  $response_1 =~ s/^.*?$mypattern//s;  #delete everything before juan-perez-91a7b112a
   
 	  while($response_1 =~ /"occupation":"(.*?)"/g) 
 	 {
        $occupation = $1; 
       }
       
-       while($response_1 =~ /"companyName":"(.*?)"/g) 
+       my ($companyName) = ($response_1 =~ /"companyName":"(.*?)"/g);
+       	 
+      
+       while($response_1 =~ /"headline":"(.*?)"/g) 
 	 {
-       $companyName = $1; 
+       $headline = $1; 
       }           
 
 	 while($response_1 =~ /"firstName":"(.*?)"/g) 
@@ -136,23 +155,34 @@ while ($url=<MYINPUT>)
        $lastName = $1; 
       }
 	  	 
+	if ($firstName eq '')
+	{				
+		if ($counter < 2)	
+		{
+			open (SALIDA,">$headline.html") || die "ERROR: No puedo abrir el fichero google.html\n";
+			print SALIDA $response_1;
+			close (SALIDA);
+			print RED,"\t\t[+] Upps $url \n",RESET;		
+			$counter++;
+			goto REPEAT;
+		}
+	}
 
-	#open (SALIDA,">$firstName.html") || die "ERROR: No puedo abrir el fichero google.html\n";
-	#print SALIDA $response_1;
-	#close (SALIDA);
+
 	  
 	  
 	  print "\t\t[+] Extrayendo datos del perfil $url \n";	  
 	  print "\t\t\t[i] Name : $firstName $lastName \n";	  ;
 	  print "\t\t\t[i] occupation $occupation \n";
-	  print "\t\t\t[i] companyName  $companyName\n\n";
+	  print "\t\t\t[i] companyName  $companyName\n";
+	  print "\t\t\t[i] headline  $headline\n\n";
 	  
 	  #"occupation":"Geretne General en Cooperativa  Catedral de Tarija Ltda."
 	  
 	  if ($occupation ne "")
 	  {	  
 		open (SALIDA,">>linked.csv") || die "ERROR: No puedo abrir el fichero google.html\n";		
-		my $output = only_ascii("$firstName;$lastName;$occupation;$companyName");		
+		my $output = only_ascii("$firstName;$lastName;$occupation;$companyName;$headline;$url");		
 		print SALIDA "$output\n";
 		close (SALIDA);
 	   }
@@ -164,8 +194,8 @@ close MYINPUT;
 
 
 system("grep --color=never -ai $key linked.csv > linkedin_$key.csv");
-system("rm linked.csv; rm url-list.csv");
-
+#system("rm linked.csv; rm url-list.csv");
+system("rm google1.html; rm google2.html");
 
 sub only_ascii
 {

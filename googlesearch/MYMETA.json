@@ -38,6 +38,7 @@
             "HTML::TreeBuilder" : "0",
             "HTTP::Cookies" : "0",
             "LWP::UserAgent" : "0",
+            "Moose" : "0",
             "Regexp::Common" : "0",
             "URI::Escape" : "0"
          }

@@ -103,8 +103,8 @@ sub search  {
 	close (SALIDA);
 
 
-my $results_list = `egrep -o '?q=http[[:print:]]{10,350};' google2.html | egrep -v "webcache|href"`;
-system("rm google1.html; rm google2.html");
+my $results_list = `egrep -o '?q=http[[:print:]]{10,350}&amp;' google2.html | egrep -v "webcache"`;
+#system("rm google1.html; rm google2.html");
                         
 $results_list =~ s/\?|q=//g; 
 my @results_array = split("\n",$results_list);
