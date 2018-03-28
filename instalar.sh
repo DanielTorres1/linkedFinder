@@ -22,12 +22,12 @@ print_ascii_art
 
 echo -e "$OKBLUE [+] Instalando Google search $RESET" 
 cd googlesearch
-sudo cpanm .
+sudo cpan .
 cd ..
 
 echo -e "$OKBLUE [+] Instalando linkedIN $RESET" 
 cd linkedin
-sudo cpanm .
+sudo cpan .
 cd ..
 
 sudo cp linkedinFinder.pl /usr/bin/linkedinFinder.pl
