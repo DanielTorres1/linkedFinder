@@ -4,25 +4,23 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
-    NAME                => 'googlesearch',
-    AUTHOR              => q{Daniel Torres <daniel.torres@owasp.org>},
-    VERSION_FROM        => 'lib/googlesearch.pm',
-    ABSTRACT_FROM       => 'lib/googlesearch.pm',
-    ($ExtUtils::MakeMaker::VERSION >= 6.3002
-      ? ('LICENSE'=> 'perl')
-      : ()),
-    PL_FILES            => {},
-    PREREQ_PM => {
-        'URI::Escape' => 0,
-        'HTML::TokeParser' => 0,
-        'HTML::Entities' => 0,
-        'Regexp::Common' => 0,
-        'HTTP::Cookies' => 0,
-        'HTML::Scrubber' => 0,
-        'HTML::TreeBuilder' => 0,
-        'LWP::UserAgent' => 0,
-        'Moose' => 0,
+    NAME             => 'googlesearch',
+    AUTHOR           => q{Daniel Torres <daniel.torres@owasp.org>},
+    VERSION_FROM     => 'lib/googlesearch.pm',
+    ABSTRACT_FROM    => 'lib/googlesearch.pm',
+    LICENSE          => 'artistic_2',
+    PL_FILES         => {},
+    MIN_PERL_VERSION => '5.006',
+    CONFIGURE_REQUIRES => {
+        'ExtUtils::MakeMaker' => '0',
     },
-    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean               => { FILES => 'googlesearch-*' },
+    BUILD_REQUIRES => {
+        'Test::More' => '0',
+    },
+    PREREQ_PM => {
+        #'ABC'              => '1.6',
+        #'Foo::Bar::Module' => '5.0401',
+    },
+    dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    clean => { FILES => 'googlesearch-*' },
 );

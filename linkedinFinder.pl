@@ -28,6 +28,14 @@ my $key = $opts{'k'} if $opts{'k'};
 
 my $banner = <<EOF;
 
+  _ _       _            _ ______ _           _           
+ | (_)     | |          | |  ____(_)         | |          
+ | |_ _ __ | | _____  __| | |__   _ _ __   __| | ___ _ __ 
+ | | | '_ \| |/ / _ \/ _` |  __| | | '_ \ / _` |/ _ \ '__|
+ | | | | | |   <  __/ (_| | |    | | | | | (_| |  __/ |   
+ |_|_|_| |_|_|\_\___|\__,_|_|    |_|_| |_|\__,_|\___|_|   
+                                                          
+                                                          
 
 Autor: Daniel Torres Sandi
 EOF
@@ -40,7 +48,7 @@ sub usage {
   print "-e : Nombre de la empresa (Como aparece en LinkedIN) \n";
   print "-p : Paginas de google a revisar \n";
   print "-k : UNA palabra clave para filtrar la salida (sigla o nombre de la empresa ) \n";
-  print "perl linkedFinder.pl -e [Mi empresa SRL]  -p 3 -k empresa \n";  
+  print "linkedFinder.pl -e [Mi empresa SRL]  -p 3 -k empresa \n";  
   
 }	
 
