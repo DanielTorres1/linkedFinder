@@ -1,7 +1,7 @@
 
 # linkedFinder
 
-Buscador de perfiles de Linkedin (bo.linkedin.com) de una determinada empresa, utiliza google dorks para determinar la lista de empleados que tienen su perfil de Linkedin para luego extraer sus datos personales y almacenarlos en un archivo csv.
+Buscador de perfiles de Linkedin de una determinada empresa. Este script utiliza google dorks para determinar la lista de empleados que tienen su perfil de Linkedin para luego extraer sus datos personales y almacenarlos en un archivo csv.
 
 
 ## ¿COMO INSTALAR?
@@ -23,5 +23,5 @@ Testeado en Kali 2:
 
 Ej: Buscar perfiles de la empresa "Hewlett Packard Enterprise" en las 3 primeras páginas de google.
 
-linkedinFinder.pl -e "Hewlett Packard Enterprise " -p 5 -k Hewlett
+    linkedinFinder.pl -e "Hewlett Packard Enterprise " -p 5 -k Hewlett
 
