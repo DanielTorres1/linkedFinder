@@ -8,13 +8,24 @@ use utf8;
 use Text::Unidecode;
 binmode STDOUT, ":encoding(UTF-8)";
 my %opts;
-getopts('e:p:k:h', \%opts);
+getopts('e:p:k:n:h', \%opts);
 
 ################ Config here ##################
 
 my $mail = 'johnswyyf@hotmail.com';
 my $password ='vdhgd543Hs';
 my $profile= "https://www.linkedin.com/in/juan-perez-91a7b112a/";
+
+#my $mail = 'juantopo2255@gmail.com';
+#my $password ='vdhgd543Hs2';
+#my $profile= "https://www.linkedin.com/in/juan-topo-a07a20161/";
+
+
+#my $mail = 'daniel.torres0085@gmail.com';
+#my $password ='mqshTobjZQEGlt3RkXi8';
+#my $profile= "https://www.linkedin.com/in/jorge-lopez-617952162/";
+
+
 ################################################
 
 
@@ -25,6 +36,7 @@ my $mypattern = @profile_array[4]; # juan-perez-91a7b112a
 my $enterprise = $opts{'e'} if $opts{'e'};
 my $pages = $opts{'p'} if $opts{'p'};
 my $key = $opts{'k'} if $opts{'k'};
+my $nogoogle = $opts{'n'} if $opts{'n'};
 
 my $banner = <<EOF;
 
@@ -71,7 +83,10 @@ my $linkedin = linkedin->new( mail => $mail,
 					proxy_user => '',
 					proxy_pass => '');
 
-$term = "site:bo.linkedin.com -inurl:/jobs/ \"$enterprise\" -intitle:mejores";
+if ($nogoogle ne 1)
+{
+
+$term = "site:bo.linkedin.com -inurl:/jobs/ \"$enterprise\" -intitle:mejores -intitle:perfiles";
 
 print YELLOW,"\t[+] Termino de busqueda: $term \n",RESET;
 print YELLOW,"\t[+] Paginas a revisar: $pages \n",RESET;
@@ -94,21 +109,40 @@ for (my $page =0 ; $page<=$pages-1;$page++)
 			close (SALIDA);
 		}	
 		my $time_sleep = 30+($page*10);
+		if ($time_sleep > 60)
+			{
+				my $random_number = int(rand(30));
+				$time_sleep=60+$random_number;
+			}
 		print "\t\t[+] Durmiendo $time_sleep  segundos para evitar bloqueo de google \n";
 		sleep $time_sleep ;
 }		
-			
+
+system("bash fix.sh");
+#system("rm url-list.csv");	
+}
 
 print BLUE,"\t[+] Extrayendo datos de linked-in \n",RESET;		
   
 $linkedin->login;								
 										
-open (MYINPUT,"<url-list.csv") || die "ERROR: Can not open the file \n";
+open (MYINPUT,"<url-list-final.csv") || die "ERROR: Can not open the file \n";
 while ($url=<MYINPUT>)
 { 
   $url =~ s/\n//g; 	
+  $pattern = $url;
+  $pattern =~ s/https:\/\/bo.linkedin.com\/in\///g; 
+  print("pattern $pattern \n");
+  $existe=`grep -ia $pattern ALL.csv`;
+  #print("$link");
+ 
+  if($existe ne ""){	 
+	$url = "";
+	print "\t\t[+] Ya recopilamos info de ese perfil \n";
+  }
+
   
- if($url =~ /dir/m){	 
+ if($url =~ /dir|showcase|company|learning/m){	 
 	 $url = "";
 	 print "\t\t[+] La URL es solo un listado de perfiles \n";
  }
@@ -127,9 +161,20 @@ while ($url=<MYINPUT>)
 	  REPEAT:
 	  my $response = $linkedin->dispatch(url =>$url,method => 'GET');	  
 	  my $response_1 = $response->decoded_content;	  	 
+	  my $status = $response->status_line;
+	  print("status $status\n");
+	   if($status =~ /Assumed/m){	 
+		   die;
+	   }
+ 
+ 	  
+	  
 	  $response_1 =~ s/&quot;/"/g; 
-	  $response_1 =~ s/&#92;"/'/g; 	 
-	  	  	 
+	  $response_1 =~ s/&amp;/&/g; 
+	  $response_1 =~ s/&#92;"/'/g;
+	  $response_1 =~ s/&#92;t//g;
+	  my $random_number = 15 + int(rand(15));
+	  sleep $random_number;
 	  	  
 	  $response_1 =~ s/^.*?$mypattern//s;  #delete everything before juan-perez-91a7b112a
   
@@ -138,8 +183,12 @@ while ($url=<MYINPUT>)
        $occupation = $1; 
       }
       
-       my ($companyName) = ($response_1 =~ /"companyName":"(.*?)"/g);
-       	 
+       #my ($companyName) = ($response_1 =~ /"companyName":"(.*?)"/g);
+       my $companyName = "";
+       while($response_1 =~ /"companyName":"(.*?)"/g) 
+	 {
+       $companyName = $companyName." | ".$1; 
+      } 	 
       
        while($response_1 =~ /"headline":"(.*?)"/g) 
 	 {
@@ -159,14 +208,15 @@ while ($url=<MYINPUT>)
 	if ($firstName eq '')
 	{				
 		if ($counter < 2)	
-		{
-			open (SALIDA,">$headline.html") || die "ERROR: No puedo abrir el fichero google.html\n";
-			print SALIDA $response_1;
-			close (SALIDA);
-			print RED,"\t\t[+] Upps $url \n",RESET;		
+		{			
 			$counter++;
 			goto REPEAT;
 		}
+		
+		open (SALIDA,">$headline.html") || die "ERROR: No puedo abrir el fichero google.html\n";
+		print SALIDA $response_1;
+		close (SALIDA);
+		print RED,"\t\t[+] Upps $url \n",RESET;	
 	}
 
 
@@ -182,19 +232,19 @@ while ($url=<MYINPUT>)
 	  
 	  if ($occupation ne "")
 	  {	  
-		open (SALIDA,">>linked.csv") || die "ERROR: No puedo abrir el fichero google.html\n";		
+		open (SALIDA,">>ALL.csv") || die "ERROR: No puedo abrir el fichero google.html\n";		
 		my $output = only_ascii("$firstName;$lastName;$occupation;$companyName;$headline;$url");		
 		print SALIDA "$output\n";
 		close (SALIDA);
 	   }
-  }
+  } # if no url
 
 
 }
 close MYINPUT;
 
 
-system("grep --color=never -ai $key linked.csv > linkedin_$key.csv");
+system("grep --color=never -ai $key ALL.csv > $key.csv");
 #system("rm linked.csv; rm url-list.csv");
 system("rm google1.html; rm google2.html");
 
