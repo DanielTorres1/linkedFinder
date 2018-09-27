@@ -12,13 +12,13 @@ getopts('e:p:k:n:h', \%opts);
 
 ################ Config here ##################
 
-my $mail = 'johnswyyf@hotmail.com';
-my $password ='vdhgd543Hs';
-my $profile= "https://www.linkedin.com/in/juan-perez-91a7b112a/";
+#my $mail = 'johnswyyf@hotmail.com';
+#my $password ='vdhgd543Hs';
+#my $profile= "https://www.linkedin.com/in/juan-perez-91a7b112a/";
 
-#my $mail = 'juantopo2255@gmail.com';
-#my $password ='vdhgd543Hs2';
-#my $profile= "https://www.linkedin.com/in/juan-topo-a07a20161/";
+my $mail = 'juantopo2255@gmail.com';
+my $password ='vdhgd543Hs2';
+my $profile= "https://www.linkedin.com/in/juan-topo-a07a20161/";
 
 
 #my $mail = 'daniel.torres0085@gmail.com';
@@ -97,8 +97,8 @@ print BLUE,"\t[+] Buscando en google \n",RESET;
 for (my $page =0 ; $page<=$pages-1;$page++)		
 {
 		print "\t\t[+] pagina: $page \n";
-		# Results 10-20 
-		$list = $google_search->search(keyword => $term, country => "bo", start => $page*10);
+		# Results 1-100
+		$list = $google_search->search(keyword => $term, country => "bo", start => $page*100);
 		my @list_array = split(";",$list);
 
 		foreach $url (@list_array)
