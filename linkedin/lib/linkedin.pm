@@ -91,13 +91,11 @@ my $hash_data = {'session_key' => $mail,
 my $post_data = convert_hash($hash_data);
 		
 $headers->header('Referer' => 'https://www.linkedin.com/login/');
-$headers->header('Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8');
-$headers->header('Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8');
-
 														
 $response = $self->dispatch(url =>'https://www.linkedin.com/uas/login-submit',method => 'POST',post_data =>$post_data,headers => $headers);
 my $status_login = $response->status_line;
-
+my $response_headers = $response->headers_as_string;
+#print "response_headers with $response_headers \n" if ($debug);
 print "status_login with $status_login \n" if ($debug);
 
 
@@ -215,11 +213,13 @@ my $headers = HTTP::Headers->new;
 			  #"Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)",
 			  #"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.95 Safari/537.36");
 			  
-$headers->header('User-Agent' => "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:56.0) Gecko/20100101 Firefox/56.0"); 
-$self->browser->default_header('User-Agent' => "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:56.0) Gecko/20100101 Firefox/56.0");
-$headers->header('Accept-Language' => 'en-US,en;q=0.5'); 
+$headers->header('User-Agent' => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.109 Safari/537.36"); 
+$self->browser->default_header('User-Agent' => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.109 Safari/537.36");
+$headers->header('Accept-Language' => 'es-ES,es;q=0.8,en-US;q=0.5,en;q=0.3'); 
 $headers->header('Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'); 
-$headers->header('Connection' => 'keep-alive'); 
+$headers->header('Upgrade-Insecure-Requests' => '1'); 
+$headers->header('DNT' => '1'); 
+
 $headers->header('Accept-Encoding' => [ HTTP::Message::decodable() ]);
 
 return $headers; 

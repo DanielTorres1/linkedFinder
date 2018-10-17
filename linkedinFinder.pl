@@ -12,13 +12,9 @@ getopts('e:p:k:n:h', \%opts);
 
 ################ Config here ##################
 
-#my $mail = 'johnswyyf@hotmail.com';
-#my $password ='vdhgd543Hs';
-#my $profile= "https://www.linkedin.com/in/juan-perez-91a7b112a/";
-
-my $mail = 'juantopo2255@gmail.com';
-my $password ='vdhgd543Hs2';
-my $profile= "https://www.linkedin.com/in/juan-topo-a07a20161/";
+my $mail = 'johnswyyf@hotmail.com';
+my $password ='vdhgd543Hs';
+my $profile= "https://www.linkedin.com/in/juan-perez-91a7b112a/";
 
 
 #my $mail = 'daniel.torres0085@gmail.com';
@@ -34,7 +30,6 @@ my $mypattern = @profile_array[4]; # juan-perez-91a7b112a
 	  
 	  
 my $enterprise = $opts{'e'} if $opts{'e'};
-my $pages = $opts{'p'} if $opts{'p'};
 my $key = $opts{'k'} if $opts{'k'};
 my $nogoogle = $opts{'n'} if $opts{'n'};
 
@@ -50,8 +45,7 @@ sub usage {
   
   print $banner;
   print "Uso:  \n";  
-  print "-e : Nombre de la empresa (Como aparece en LinkedIN) \n";
-  print "-p : Paginas de google a revisar \n";
+  print "-e : Nombre de la empresa (Como aparece en LinkedIN) \n";  
   print "-k : UNA palabra clave para filtrar la salida (sigla o nombre de la empresa ) \n";
   print "linkedFinder.pl -e [Mi empresa SRL]  -p 3 -k empresa \n";  
   
@@ -86,19 +80,41 @@ my $linkedin = linkedin->new( mail => $mail,
 if ($nogoogle ne 1)
 {
 
-$term = "site:bo.linkedin.com -inurl:/jobs/ \"$enterprise\" -intitle:mejores -intitle:perfiles";
+	$term = "site:bo.linkedin.com -inurl:/jobs/ \"$enterprise\" -intitle:mejores -intitle:perfiles";
+	
+	print BLUE,"\t[+] Estimando resultados .. \n",RESET;
+	my $url = "http://www.google.com/search?output=search&sclient=psy-ab&q=$term&btnG=&gbv=1&filter=0&num=100";
+	$response = $google_search->dispatch(url =>$url ,method => 'GET');
+	my $content = $response->content;
+
+	open (SALIDA,">>google.html") || die "ERROR: No puedo abrir el fichero $salida\n";
+	print SALIDA $content,"\n" ;
+	close (SALIDA);
+	
+	 #if (! ($content =~ /our systems have detected unusual traffic/m)){	 
+		 #print "Captcha detected !!";
+		#die;
+	#}
+			
+	$total_pages=`grep -o 'start=' google.html | wc -l`;
+	system("rm google.html");
+	
+	
+
 
 print YELLOW,"\t[+] Termino de busqueda: $term \n",RESET;
-print YELLOW,"\t[+] Paginas a revisar: $pages \n",RESET;
+print YELLOW,"\t[+] Paginas a revisar: $total_pages \n",RESET;
 print YELLOW,"\t[+] Filtrar resultados por: $key \n",RESET;
 
 print BLUE,"\t[+] Buscando en google \n",RESET;
 		
-for (my $page =0 ; $page<=$pages-1;$page++)		
+for (my $page =0 ; $page<=$total_pages-1;$page++)		
 {
-		print "\t\t[+] pagina: $page \n";
+		print "\t\t[+] pagina : $page \n";
 		# Results 1-100
-		$list = $google_search->search(keyword => $term, country => "bo", start => $page*100);
+		#print "term $term \n";
+		$list = $google_search->search(keyword => $term, country => "bo", start => $page*100);		
+		#print "list $list \n";
 		my @list_array = split(";",$list);
 
 		foreach $url (@list_array)
@@ -118,7 +134,7 @@ for (my $page =0 ; $page<=$pages-1;$page++)
 		sleep $time_sleep ;
 }		
 
-system("bash fix.sh");
+#system("bash fix.sh");
 #system("rm url-list.csv");	
 }
 
@@ -126,20 +142,20 @@ print BLUE,"\t[+] Extrayendo datos de linked-in \n",RESET;
   
 $linkedin->login;								
 										
-open (MYINPUT,"<url-list-final.csv") || die "ERROR: Can not open the file \n";
+open (MYINPUT,"<url-list.csv") || die "ERROR: Can not open the file \n";
 while ($url=<MYINPUT>)
 { 
   $url =~ s/\n//g; 	
-  $pattern = $url;
-  $pattern =~ s/https:\/\/bo.linkedin.com\/in\///g; 
-  print("pattern $pattern \n");
-  $existe=`grep -ia $pattern ALL.csv`;
+  #$pattern = $url;
+  #$pattern =~ s/https:\/\/bo.linkedin.com\/in\///g; 
+  #print("pattern $pattern \n");
+  #$existe=`grep -ia $pattern ALL.csv`;
   #print("$link");
  
-  if($existe ne ""){	 
-	$url = "";
-	print "\t\t[+] Ya recopilamos info de ese perfil \n";
-  }
+  #if($existe ne ""){	 
+#	$url = "";
+	#print "\t\t[+] Ya recopilamos info de ese perfil \n";
+  #}
 
   
  if($url =~ /dir|showcase|company|learning/m){	 
