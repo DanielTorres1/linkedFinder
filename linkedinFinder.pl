@@ -17,9 +17,12 @@ my $password ='vdhgd543Hs';
 my $profile= "https://www.linkedin.com/in/juan-perez-91a7b112a/";
 
 
-#my $mail = 'daniel.torres0085@gmail.com';
-#my $password ='mqshTobjZQEGlt3RkXi8';
-#my $profile= "https://www.linkedin.com/in/jorge-lopez-617952162/";
+#my $mail = 'dtorres@agetic.gob.bo';
+#my $password ='BoliviaenTusManos';
+#my $profile= "https://www.linkedin.com/in/juan-gonzales-722675172/";
+
+
+
 
 
 ################################################
@@ -96,7 +99,17 @@ if ($nogoogle ne 1)
 		#die;
 	#}
 			
-	$total_pages=`grep -o 'start=' google.html | wc -l`;
+	$noresult=`grep 'o se han encontrado resultados' google.html`;    
+    if ($noresult eq "")
+	{
+		$total_pages=`grep -o 'start=' google.html | wc -l`; 
+		#print "total_pages $total_pages \n";
+		if ($total_pages == 0)
+		   {$total_pages=1;}
+	}
+	else
+	{print "No hay resultados en google para esa busqueda"; die;}
+	
 	system("rm google.html");
 	
 	
@@ -178,10 +191,16 @@ while ($url=<MYINPUT>)
 	  my $response = $linkedin->dispatch(url =>$url,method => 'GET');	  
 	  my $response_1 = $response->decoded_content;	  	 
 	  my $status = $response->status_line;
+	  
+	  open (SALIDA,">>linkedin.html") || die "ERROR: No puedo abrir el fichero google.html\n";				
+		print SALIDA "$response_1\n";
+		close (SALIDA);
+		
+		
 	  print("status $status\n");
-	   if($status =~ /Assumed/m){	 
-		   die;
-	   }
+	  # if($status =~ /Assumed/m){	 
+		   #die;
+	   #}
  
  	  
 	  
@@ -189,7 +208,7 @@ while ($url=<MYINPUT>)
 	  $response_1 =~ s/&amp;/&/g; 
 	  $response_1 =~ s/&#92;"/'/g;
 	  $response_1 =~ s/&#92;t//g;
-	  my $random_number = 15 + int(rand(15));
+	  my $random_number = 30 + int(rand(30));
 	  sleep $random_number;
 	  	  
 	  $response_1 =~ s/^.*?$mypattern//s;  #delete everything before juan-perez-91a7b112a
