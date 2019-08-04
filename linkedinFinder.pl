@@ -8,7 +8,7 @@ use utf8;
 use Text::Unidecode;
 binmode STDOUT, ":encoding(UTF-8)";
 my %opts;
-getopts('e:p:k:n:h', \%opts);
+getopts('n:p:g:l:h', \%opts);
 
 ################ Config here ##################
 
@@ -32,9 +32,9 @@ my @profile_array = split /\//, $profile; #from URL to array
 my $mypattern = @profile_array[4]; # juan-perez-91a7b112a
 	  
 	  
-my $enterprise = $opts{'e'} if $opts{'e'};
-my $key = $opts{'k'} if $opts{'k'};
-my $nogoogle = $opts{'n'} if $opts{'n'};
+my $nombre = $opts{'n'} if $opts{'n'};
+my $log_file = $opts{'l'} if $opts{'l'};
+my $nogoogle = $opts{'g'} if $opts{'g'};
 
 my $banner = <<EOF;
 
@@ -49,8 +49,7 @@ sub usage {
   print $banner;
   print "Uso:  \n";  
   print "-e : Nombre de la empresa (Como aparece en LinkedIN) \n";  
-  print "-k : UNA palabra clave para filtrar la salida (sigla o nombre de la empresa ) \n";
-  print "linkedFinder.pl -e [Mi empresa SRL]  -p 3 -k empresa \n";  
+  print "linkedFinder.pl -e [Mi empresa SRL]  -p 3 \n";  
   
 }	
 
@@ -83,7 +82,7 @@ my $linkedin = linkedin->new( mail => $mail,
 if ($nogoogle ne 1)
 {
 
-	$term = "site:bo.linkedin.com -inurl:/jobs/ \"$enterprise\" -intitle:mejores -intitle:perfiles";
+	$term = "site:bo.linkedin.com -inurl:/jobs/ \"$nombre\" -intitle:mejores -intitle:perfiles";
 	
 	print BLUE,"\t[+] Estimando resultados .. \n",RESET;
 	my $url = "http://www.google.com/search?output=search&sclient=psy-ab&q=$term&btnG=&gbv=1&filter=0&num=100";
@@ -117,7 +116,6 @@ if ($nogoogle ne 1)
 
 print YELLOW,"\t[+] Termino de busqueda: $term \n",RESET;
 print YELLOW,"\t[+] Paginas a revisar: $total_pages \n",RESET;
-print YELLOW,"\t[+] Filtrar resultados por: $key \n",RESET;
 
 print BLUE,"\t[+] Buscando en google \n",RESET;
 		
@@ -125,8 +123,8 @@ for (my $page =0 ; $page<=$total_pages-1;$page++)
 {
 		print "\t\t[+] pagina : $page \n";
 		# Results 1-100
-		#print "term $term \n";
-		$list = $google_search->search(keyword => $term, country => "bo", start => $page*100);		
+		#print "term $term \n";		
+		$list = $google_search->search(keyword => $term, country => "bo", start => $page*100, log => "/dev/null");
 		#print "list $list \n";
 		my @list_array = split(";",$list);
 
@@ -148,12 +146,11 @@ for (my $page =0 ; $page<=$total_pages-1;$page++)
 }		
 
 #system("bash fix.sh");
-#system("rm url-list.csv");	
 }
 
 print BLUE,"\t[+] Extrayendo datos de linked-in \n",RESET;		
   
-$linkedin->login;								
+#$linkedin->login;								
 										
 open (MYINPUT,"<url-list.csv") || die "ERROR: Can not open the file \n";
 while ($url=<MYINPUT>)
@@ -187,14 +184,17 @@ while ($url=<MYINPUT>)
 	  $url =~ s/bo\./www\./g; 	
 	  $url = $url."/?ppe=1";
 	  my $counter=0;
+	  
 	  REPEAT:
 	  my $response = $linkedin->dispatch(url =>$url,method => 'GET');	  
 	  my $response_1 = $response->decoded_content;	  	 
 	  my $status = $response->status_line;
 	  
-	  open (SALIDA,">>linkedin.html") || die "ERROR: No puedo abrir el fichero google.html\n";				
-		print SALIDA "$response_1\n";
-		close (SALIDA);
+	  
+	  
+	  #open (SALIDA,">>linkedin.html") || die "ERROR: No puedo abrir el fichero google.html\n";				
+#		print SALIDA "$response_1\n";
+		#close (SALIDA);
 		
 		
 	  print("status $status\n");
@@ -208,41 +208,42 @@ while ($url=<MYINPUT>)
 	  $response_1 =~ s/&amp;/&/g; 
 	  $response_1 =~ s/&#92;"/'/g;
 	  $response_1 =~ s/&#92;t//g;
-	  my $random_number = 30 + int(rand(30));
-	  sleep $random_number;
+	  #my $random_number = 30 + int(rand(30));
+	  #sleep $random_number;
 	  	  
-	  $response_1 =~ s/^.*?$mypattern//s;  #delete everything before juan-perez-91a7b112a
-  
-	  while($response_1 =~ /"occupation":"(.*?)"/g) 
-	 {
-       $occupation = $1; 
-      }
-      
-       #my ($companyName) = ($response_1 =~ /"companyName":"(.*?)"/g);
-       my $companyName = "";
-       while($response_1 =~ /"companyName":"(.*?)"/g) 
-	 {
-       $companyName = $companyName." | ".$1; 
-      } 	 
-      
-       while($response_1 =~ /"headline":"(.*?)"/g) 
-	 {
-       $headline = $1; 
-      }           
+	  #$response_1 =~ s/^.*?$mypattern//s;  #delete everything before juan-perez-91a7b112a
+        
 
-	 while($response_1 =~ /"firstName":"(.*?)"/g) 
-	 {
-       $firstName = $1; 
-      }
+	 #while($response_1 =~ /"firstName":"(.*?)"/g) 
+	 #{
+       #$firstName = $1; 
+      #}
       
-      while($response_1 =~ /"lastName":"(.*?)"/g) 
-	 {
-       $lastName = $1; 
-      }
+      
+	 #"name":"Marisol Catari"  
+	 $response_1 =~ /"name":"(.*?)"/;
+	 my $nombre = $1; 
+
+	#data-section="headline">Adm. de Base de Datos en Banco Central de Bolivia</
+	 $response_1 =~ /data-section="headline">(.*?)</;
+	 my $headline = $1; 
+ 
+	#"position__company-name">Ministerio de Desarrollo Productivo y Economía Plural</
+	$response_1 =~ /"position__company-name">(.*?)</;
+	 my $company = $1; 
+	 $company =~ s/-/ /g;
+	 $headline =~ s/-/ /g;
+ 
+      
+      
+#      while($response_1 =~ /"lastName":"(.*?)"/g) 
+	 #{
+       #$lastName = $1; 
+      #}
 	  	 
-	if ($firstName eq '')
+	if ($nombre eq '')
 	{				
-		if ($counter < 2)	
+		if ($counter < 1)	
 		{			
 			$counter++;
 			goto REPEAT;
@@ -253,22 +254,17 @@ while ($url=<MYINPUT>)
 		close (SALIDA);
 		print RED,"\t\t[+] Upps $url \n",RESET;	
 	}
-
-
-	  
 	  
 	  print "\t\t[+] Extrayendo datos del perfil $url \n";	  
-	  print "\t\t\t[i] Name : $firstName $lastName \n";	  ;
-	  print "\t\t\t[i] occupation $occupation \n";
-	  print "\t\t\t[i] companyName  $companyName\n";
-	  print "\t\t\t[i] headline  $headline\n\n";
+	  print "\t\t\t[i] Nombre : $nombre \n";	  ;	  
+	  print "\t\t\t[i] headline  $headline\n";
+	  print "\t\t\t[i] Compañia  $company\n\n";
 	  
-	  #"occupation":"Geretne General en Cooperativa  Catedral de Tarija Ltda."
 	  
-	  if ($occupation ne "")
+	  if ($headline ne "")
 	  {	  
-		open (SALIDA,">>ALL.csv") || die "ERROR: No puedo abrir el fichero google.html\n";		
-		my $output = only_ascii("$firstName;$lastName;$occupation;$companyName;$headline;$url");		
+		open (SALIDA,">>$log_file") || die "ERROR: No puedo abrir el fichero google.html\n";		
+		my $output = only_ascii("$nombre;$headline;$company");		
 		print SALIDA "$output\n";
 		close (SALIDA);
 	   }
@@ -278,10 +274,7 @@ while ($url=<MYINPUT>)
 }
 close MYINPUT;
 
-
-system("grep --color=never -ai $key ALL.csv > $key.csv");
-#system("rm linked.csv; rm url-list.csv");
-system("rm google1.html; rm google2.html");
+system("rm url-list.csv");	
 
 sub only_ascii
 {
